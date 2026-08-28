@@ -1,0 +1,16 @@
+# Credential — KHÔNG đẩy lên repo
+fb_cookies.json
+*.cookie
+*_cookies.json
+
+# Screenshots debug
+*.png
+debug_*.png
+f_*.png
+posted.png
+fail_*.png
+no_*.png
+
+# Python cache
+__pycache__/
+*.pyc
