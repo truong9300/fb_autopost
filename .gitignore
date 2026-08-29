@@ -1,7 +1,9 @@
 # Credential — KHÔNG đẩy lên repo
 fb_cookies.json
+fb_cookies_list.json
 *.cookie
 *_cookies.json
+*_cookies_list.json
 
 # Screenshots debug
 *.png
