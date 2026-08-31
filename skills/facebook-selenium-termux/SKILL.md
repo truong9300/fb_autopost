@@ -444,7 +444,26 @@ Extract comment text from any post URL (works for /share/ and /share/r/):
 3. For Reels the comment panel must be opened first (same click as commenting) or `contenteditable` count is 0 and comments may not render.
 Full runnable script: `references/working_read_comments.py`.
 
-## ANTI-LOOP: don't re-derive a working path mid-session
+## ANTI-LOOP (2026-08-31 addendum): Chrome binary lost → REINSTALL, never fall back to Playwright
+If `new_driver()` fails with `SessionNotCreatedException: cannot connect to chrome` or the
+`/usr/bin/google-chrome-stable` binary is MISSING (e.g. deleted during a VPS disk cleanup),
+the fix is ONE command — do NOT re-explore Playwright/selenium alternatives:
+```bash
+# On VPS LowEndViet (180.93.139.26:22601):
+apt-get install --reinstall -y google-chrome-stable   # restores /usr/bin/google-chrome-stable -> /opt/google/chrome/google-chrome
+/usr/bin/google-chrome-stable --version               # expect Chrome 15x/16x
+```
+Then in `references/working_text_post_profile.py`:
+- `o.binary_location = "/usr/bin/google-chrome-stable"`   (NOT playwright chromium — that hits the IDENTICAL Lexical block)
+- `version_main=` must match the reinstalled Chrome MAJOR (was 151, became 152 after reinstall — set to the `--version` major)
+- Keep `--headless=new` + `--disable-gpu` (the Xvfb path also works, but headless is simpler)
+- `VERIFY_PHRASE` = a unique substring of the CURRENT message
+Re-run `working_text_post_profile.py` — it VERIFIED-publishes (CO BAI + vision confirm).
+**Do NOT write a Playwright version** — SKILL.md already documents that Playwright hits the
+same Lexical `typed len: 1` block as Selenium and wastes ~15 tool calls. Reinstall Chrome, reuse
+the verified Selenium/UC script. (Cost this session: ~15 wasted Playwright calls before realizing
+the only blocker was a missing Chrome binary — don't repeat.)
+
 When a VERIFIED script already exists for the task (e.g. `references/working_text_post_profile.py`
 for text posts, `references/working_photo_post_mobile.py` for photo+text), **run THAT script first**
 — do NOT re-explore 10+ alternative input methods (execCommand, InputEvent, send_keys, xdotool,

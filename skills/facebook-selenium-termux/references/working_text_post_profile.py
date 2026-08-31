@@ -25,7 +25,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 COOKIE_FILE = os.path.join(HERE, "fb_cookies_list.json")   # BARE LIST, not {"cookies":[...]}
 MSG_FILE = os.path.join(HERE, "fb_post_message.txt")
 # Unique phrase from the post used to verify on the live feed (change per post):
-VERIFY_PHRASE = "BÓNG ĐEN THÙ GHÉT"
+VERIFY_PHRASE = "Hôm nay không tạo ảnh nào"
 
 def start_xvfb():
     p = subprocess.Popen(["Xvfb", ":99", "-screen", "0", "1280x1400x24"],
@@ -33,13 +33,14 @@ def start_xvfb():
     os.environ["DISPLAY"] = ":99"; time.sleep(1); return p
 
 def new_driver():
-    o = uc.ChromeOptions(); o.binary_location = "/root/.cache/ms-playwright/chromium-1234/chrome-linux64/chrome"
+    o = uc.ChromeOptions(); o.binary_location = "/usr/bin/google-chrome-stable"
     for a in ("--no-sandbox", "--disable-dev-shm-usage", "--window-size=420,900",
-              "--lang=vi-VN", "--disable-notifications",
+              "--lang=vi-VN", "--disable-notifications", "--headless=new",
+              "--disable-gpu", "--disable-software-rasterizer",
               "--user-agent=Mozilla/5.0 (Linux; Android 16; Pixel 7) AppleWebKit/537.36 "
               "(KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36"):
         o.add_argument(a)
-    return uc.Chrome(options=o, version_main=151, use_subprocess=True)
+    return uc.Chrome(options=o, version_main=152, use_subprocess=True)
 
 def install_cookies(d):
     d.get("https://m.facebook.com/"); time.sleep(2)
@@ -85,7 +86,7 @@ def find_post_btn(d):
 def main():
     MESSAGE = open(MSG_FILE, encoding="utf-8").read().strip()
     print("Dang bai TEXT profile Quan Vu (m.facebook.com)")
-    xvfb = start_xvfb(); d = new_driver()
+    d = new_driver()
     try:
         install_cookies(d)
         print("Login:", "login" not in d.current_url.lower())
@@ -120,7 +121,7 @@ def main():
         print("CO BAI" if VERIFY_PHRASE in src else "CHUA THAY")
         d.save_screenshot("f_verify.png")
     finally:
-        d.quit(); xvfb.terminate()
+        d.quit()
 
 if __name__ == "__main__":
     main()
